@@ -217,6 +217,9 @@ def parse(argparser):
     argparser.add_argument(
         '--no_404', action='store_false',
         help='disables reporting 404 error when download fails')
+    argparser.add_argument(
+        '--follow_date', action='store_true',
+        help='Enable date follow')
 
     return argparser.parse_args()
 
@@ -231,6 +234,7 @@ if __name__ == '__main__':
     ))
     ERROR_404 = args.no_404
     cache_dir = args.cache_dir
+    follow_date = args.follow_date
     metadata_iter = meta_data(
         args.from_date, args.to_date, args.step
     )
@@ -283,7 +287,7 @@ if __name__ == '__main__':
                 ])
             ])
         ))
-        if True:
+        if follow_date:
             # TODO: switch that enables date folowing with a certain gap
             first_repo = repo
             dwnld_files = list(first_repo.down_xml_gzs)
