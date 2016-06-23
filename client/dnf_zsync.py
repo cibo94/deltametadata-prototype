@@ -1,6 +1,7 @@
 import os.path
 import os
 import re
+from threading import Timer
 from subprocess import PIPE, CalledProcessError, Popen, check_output
 
 import dnf
@@ -65,6 +66,12 @@ class PluginImpl(object):
             repomd_f.write(repomd)
 
     def _sync(self, url, input_file, target):
+        def kill(proc):
+            try:
+                proc.kill()
+            except OSError:
+                pass # ignore
+
         " this is exception safe (unless something unexpected will happen) "
         # if file that will be synced does not exists, this should be aborted
         if not os.path.isfile(input_file):
@@ -72,7 +79,12 @@ class PluginImpl(object):
         try:
             zsync = Popen(["zsync", url, "-i", input_file, "-o",
                            target], stdout=PIPE, stderr=PIPE)
+            # bug in zsync causing deadlock
+            # So if zsync doesn't end until 120 second, it will be killed
+            t = Timer(120, kill, [zsync])
+            t.start()
             outputs = zsync.communicate()
+            t.cancel()
             if self._print_log:
                 print(outputs[1].decode("utf-8"))
                 print(outputs[0].decode("utf-8"))

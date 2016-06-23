@@ -209,17 +209,17 @@ def parse(argparser):
         'to_date', type=valid_date,
         help='date to which this will iterativelly downloads metadata')
     argparser.add_argument(
-        '--step', type=unsinged, default='1',
+        '-s', '--step', type=unsinged, default='1',
         help='step of iteration from from_date to to_date')
     argparser.add_argument(
-        '--cache_dir', type=path, default='./',
+        '-c', '--cache_dir', type=path, default='./', metavar='DIR',
         help='directory where repomd.xml and repodata/ will be')
+    argparser.add_argument(
+        '-f', '--follow_date', action='store', const=0, default=1, metavar='GAP',
+        nargs='?', type=int, help='enable date follow with certain gap [default 1]')
     argparser.add_argument(
         '--no_404', action='store_false',
         help='disables reporting 404 error when download fails')
-    argparser.add_argument(
-        '--follow_date', action='store_true',
-        help='Enable date follow')
 
     return argparser.parse_args()
 
